@@ -1,6 +1,11 @@
 #include "TVector.h"
 #include "math.h"
 
+TVector::TVector() {
+	this->n = 0;
+	this->x = nullptr;
+}
+
 TVector::TVector(int size) {
 	this->n = size;
 	this->x = new double[n];
@@ -14,7 +19,7 @@ TVector::TVector(const TVector& Temp) {
 }
 
 TVector::~TVector() {
-	delete [] this->x;
+	delete[] this->x;
 }
 
 TVector TVector::operator = (const TVector& Temp) {
@@ -64,7 +69,7 @@ double TVector::operator * (const TVector& Temp) {
 TVector TVector::operator + (double Temp) {
 	TVector res(this->n);
 	for (int i = 0; i < this->n; i++) {
-		res = this->x[i] + Temp;
+		res[i] = this->x[i] + Temp;
 	}
 	return res;
 }
@@ -72,7 +77,7 @@ TVector TVector::operator + (double Temp) {
 TVector TVector::operator - (double Temp) {
 	TVector res(this->n);
 	for (int i = 0; i < this->n; i++) {
-		res = this->x[i] - Temp;
+		res[i] = this->x[i] - Temp;
 	}
 	return res;
 }
@@ -80,7 +85,7 @@ TVector TVector::operator - (double Temp) {
 TVector TVector::operator * (double Temp) {
 	TVector res(this->n);
 	for (int i = 0; i < this->n; i++) {
-		res = this->x[i] * Temp;
+		res[i] = this->x[i] * Temp;
 	}
 	return res;
 }
@@ -93,5 +98,26 @@ double TVector::norma() const {
 	return sqrt(res);
 }
 
-friend std::istream& operator >> (istream&, TVector&);
-friend std::ostream& operator << (ostream&, TVector&);
+std::istream& operator >> (istream& in, TVector& Temp) {
+	int n;
+	std::cout << "Пожалуйста, введите размерность вектора: ";
+	in >> n;
+	std::cout << "Пожалуйста, введите координаты данного вектора: \n";
+	if (Temp.x != nullptr) {
+		delete[] Temp.x;
+	}
+	Temp.n = n;
+	Temp.x = new double[Temp.n];
+	for (int i = 0; i < n; i++) {
+		in >> Temp[i];
+	}
+	return in;
+}
+
+std::ostream& operator << (ostream& out, const TVector& Temp) {
+	for (int i = 0; i < Temp.n; i++)
+	{
+		out << Temp[i] << " ";
+	}
+	return out;
+}

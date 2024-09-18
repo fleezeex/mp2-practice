@@ -7,6 +7,7 @@ private:
 	int n;
 	double* x;
 public:
+	TVector();
 	TVector(int size);
 	TVector(const TVector&);
 	~TVector();
@@ -27,6 +28,6 @@ public:
 	const double& operator [] (const int index) const { return x[index]; };
 
 	friend std::istream& operator >> (istream&, TVector&);
-	friend std::ostream& operator << (ostream&, TVector&);
+	friend std::ostream& operator << (ostream&, const TVector&);
 };
 
