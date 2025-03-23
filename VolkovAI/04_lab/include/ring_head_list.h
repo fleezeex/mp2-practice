@@ -100,7 +100,7 @@ public:
 
     void push_front(TNode<TElem>* Node) {
         if (Node == nullptr) {
-            throw std::invalid_argument("Node cannot be nullptr.");
+            throw ("Node cannot be nullptr.");
         }
         HeadList<TElem>::push_front(Node);
         if (this->pLast) {
@@ -110,7 +110,7 @@ public:
     }
     void insert_after(TNode<TElem>* Node, TElem val) {
         if (Node == nullptr) {
-            throw std::invalid_argument("Node cannot be nullptr.");
+            throw ("Node cannot be nullptr.");
         }
         this->reset();
         while (!this->isEnded()) {
@@ -129,7 +129,7 @@ public:
     }
     void insert_before(TNode<TElem>* Node, TElem val) {
         if (Node == nullptr) {
-            throw std::invalid_argument("Node cannot be nullptr.");
+            throw("Node cannot be nullptr.");
         }
         this->reset();
         while (!this->isEnded()) {
@@ -159,7 +159,7 @@ public:
 
     void push_back(TNode<TElem>* Node) {
         if (Node == nullptr) {
-            throw std::invalid_argument("Node cannot be nullptr.");
+            throw ("Node cannot be nullptr.");
         }
         HeadList<TElem>::push_back(Node);
         do_ringlist();

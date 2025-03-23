@@ -1,6 +1,5 @@
 #pragma once
 #include <iostream>
-#include <stdexcept> // для std::invalid_argument
 #include "ring_head_list.h"
 #include "monomial.h"
 
@@ -36,7 +35,20 @@ public:
                 : '+';
             Monomial monomial = parseMonomial(token, sign);
             if (monomial.getCoeff() != 0) {
-                pol.push_back(monomial);
+                // проверяем есть ли уже такой моном в списке
+                TNode<Monomial>* node = pol.get_pHead()->pNext;
+                bool found = false;
+                while (node != pol.get_pHead()) {
+                    if (node->value.getDegree() == monomial.getDegree()) {
+                        node->value = node->value + monomial;
+                        found = true;
+                        break;
+                    }
+                    node = node->pNext;
+                }
+                if (!found) {
+                    pol.push_back(monomial); // не нашли - добавляем новый моном
+                }
             }
             pos = nextPos;
         }
@@ -123,16 +135,16 @@ public:
 
     void updateName() {
         name.clear();
-        if (pol.get_pHead() == nullptr) {
+        if (pol.isEmpty()) {
             return;
         }
 
-        TNode<Monomial>* node = pol.get_pHead()->pNext;
-
-        while (node != pol.get_pHead()) {
-            std::string monomialStr = node->value.monomial_handling(node->value);
+        pol.reset();
+        while (!pol.isEnded()) {
+            Monomial currentMonomial = pol.current();
+            std::string monomialStr = currentMonomial.monomial_handling(currentMonomial);
             name += monomialStr;
-            node = node->pNext;
+            pol.next();
         }
 
         if (!name.empty() && name[0] == '+') {
@@ -143,40 +155,43 @@ public:
     polynomial operator+(const polynomial& p) const {
         polynomial result;
 
-        if (pol.get_pHead() == nullptr || p.pol.get_pHead() == nullptr) {
+        if (pol.isEmpty() || p.pol.isEmpty()) {
             return result;
         }
 
-        TNode<Monomial>* iter1 = pol.get_pHead()->pNext;
-        TNode<Monomial>* iter2 = p.pol.get_pHead()->pNext;
+        pol.reset();
+        p.pol.reset();
 
-        while (iter1 != pol.get_pHead() && iter2 != p.pol.get_pHead()) {
-            if (iter1->value < iter2->value) {
-                result.pol.push_back(iter1->value);
-                iter1 = iter1->pNext;
+        while (!pol.isEnded() && !p.pol.isEnded()) {
+            Monomial monomial1 = pol.current();
+            Monomial monomial2 = p.pol.current();
+
+            if (monomial1 < monomial2) {
+                result.pol.push_back(monomial1);
+                pol.next();
             }
-            else if (iter1->value > iter2->value) {
-                result.pol.push_back(iter2->value);
-                iter2 = iter2->pNext;
+            else if (monomial1 > monomial2) {
+                result.pol.push_back(monomial2);
+                p.pol.next();
             }
             else {
-                Monomial sum = iter1->value + iter2->value;
+                Monomial sum = monomial1 + monomial2;
                 if (sum.getCoeff() != 0) {
                     result.pol.push_back(sum);
                 }
-                iter1 = iter1->pNext;
-                iter2 = iter2->pNext;
+                pol.next();
+                p.pol.next();
             }
         }
 
-        while (iter1 != pol.get_pHead()) {
-            result.pol.push_back(iter1->value);
-            iter1 = iter1->pNext;
+        while (!pol.isEnded()) {
+            result.pol.push_back(pol.current());
+            pol.next();
         }
 
-        while (iter2 != p.pol.get_pHead()) {
-            result.pol.push_back(iter2->value);
-            iter2 = iter2->pNext;
+        while (!p.pol.isEnded()) {
+            result.pol.push_back(p.pol.current());
+            p.pol.next();
         }
 
         result.updateName();
@@ -189,32 +204,34 @@ public:
 
     polynomial operator*(const polynomial& p) const {
         polynomial result;
-        auto iter1 = this->pol.get_pHead()->pNext;
 
-        while (iter1 != this->pol.get_pHead()) {
-            auto iter2 = p.pol.get_pHead()->pNext;
-
-            while (iter2 != p.pol.get_pHead()) {
-                Monomial product = iter1->value * iter2->value;
+        this->pol.reset();
+        while (!this->pol.isEnded()) {
+            Monomial monomial1 = this->pol.current();
+            p.pol.reset();
+            while (!p.pol.isEnded()) {
+                Monomial monomial2 = p.pol.current();
+                Monomial product = monomial1 * monomial2;
 
                 if (product.getCoeff() != 0) {
-                    TNode<Monomial>* found = result.pol.get_pHead()->pNext;
-                    while (found != result.pol.get_pHead() && found->value.getDegree() != product.getDegree()) {
-                        found = found->pNext;
+                    bool found = false;
+                    result.pol.reset();
+                    while (!result.pol.isEnded()) {
+                        Monomial& current = result.pol.current();
+                        if (current.getDegree() == product.getDegree()) {
+                            current = current + product;
+                            found = true;
+                            break;
+                        }
+                        result.pol.next();
                     }
-
-                    if (found != result.pol.get_pHead()) {
-                        found->value = Monomial(product.getDegree(), found->value.getCoeff() + product.getCoeff());
-                    }
-                    else {
+                    if (!found) {
                         result.pol.push_back(product);
                     }
                 }
-
-                iter2 = iter2->pNext;
+                p.pol.next();
             }
-
-            iter1 = iter1->pNext;
+            this->pol.next();
         }
 
         result.updateName();
@@ -223,28 +240,27 @@ public:
 
     double operator()(double x, double y, double z) const {
         double result = 0.0;
-        TNode<Monomial>* temp = pol.get_pHead()->pNext;
-
-        while (temp != pol.get_pHead()) {
-            result += temp->value.count(x, y, z);
-            temp = temp->pNext;
+        pol.reset();
+        while (!pol.isEnded()) {
+            result += pol.current().count(x, y, z);
+            pol.next();
         }
-
         return result;
     }
 
     polynomial operator+(double c) const {
         polynomial result(*this);
-        TNode<Monomial>* iter = result.pol.get_pHead()->pNext;
         bool foundZeroDegree = false;
 
-        while (iter != result.pol.get_pHead()) {
-            if (iter->value.getDegree() == 0) {
-                iter->value = iter->value + c;
+        result.pol.reset();
+        while (!result.pol.isEnded()) {
+            if (result.pol.current().getDegree() == 0) {
+                Monomial newMonomial = result.pol.current() + c;
+                result.pol.current() = newMonomial;
                 foundZeroDegree = true;
                 break;
             }
-            iter = iter->pNext;
+            result.pol.next();
         }
 
         if (!foundZeroDegree) {
@@ -261,27 +277,32 @@ public:
 
     polynomial operator*(double c) const {
         polynomial result;
-        TNode<Monomial>* iter = pol.get_pHead()->pNext;
-        while (iter != pol.get_pHead()) {
-            result.pol.push_back(iter->value * c);
-            iter = iter->pNext;
+        pol.reset();
+        while (!pol.isEnded()) {
+            result.pol.push_back(pol.current() * c);
+            pol.next();
         }
         result.updateName();
         return result;
     }
 
     bool operator==(const polynomial& p) const {
-        if (pol.get_pHead() == nullptr || p.pol.get_pHead() == nullptr) {
+        if (pol.isEmpty() || p.pol.isEmpty()) {
             return false;
         }
-        TNode<Monomial>* iter1 = pol.get_pHead()->pNext;
-        TNode<Monomial>* iter2 = p.pol.get_pHead()->pNext;
-        while (iter1 != pol.get_pHead() && iter2 != p.pol.get_pHead()) {
-            if (iter1->value != iter2->value) return false;
-            iter1 = iter1->pNext;
-            iter2 = iter2->pNext;
+
+        pol.reset();
+        p.pol.reset();
+
+        while (!pol.isEnded() && !p.pol.isEnded()) {
+            if (pol.current() != p.pol.current()) {
+                return false;
+            }
+            pol.next();
+            p.pol.next();
         }
-        return iter1 == pol.get_pHead() && iter2 == p.pol.get_pHead();
+
+        return pol.isEnded() && p.pol.isEnded();
     }
 
     bool operator!=(const polynomial& p) const {

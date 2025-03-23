@@ -20,7 +20,9 @@ template <typename TElem> struct TNode {
 
 template <typename TElem> class TList {
 protected:
-    TNode<TElem>* pFirst, * pLast, * pCurr, * pPrev, * pStop;
+    TNode<TElem>* pFirst, * pLast;
+    mutable TNode<TElem>* pCurr, * pPrev;
+    TNode<TElem>* pStop;
 public:
     TList() {
         pFirst = nullptr;
@@ -232,7 +234,7 @@ public:
     bool operator!= (const TList<TElem>& list) const {
         return !(*this == list);
     }
-    void reset() {
+    void reset() const {
         pCurr = pFirst;
         pPrev = pStop;
     }
@@ -242,7 +244,7 @@ public:
         }
         return pCurr->value;
     }
-    void next() {
+    void next() const {
         if (pCurr == nullptr) {
             throw "Current pointer is nullptr.";
         }
