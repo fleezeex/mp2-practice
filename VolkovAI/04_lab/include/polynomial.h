@@ -136,6 +136,7 @@ public:
     void updateName() {
         name.clear();
         if (pol.isEmpty()) {
+            name = "0";
             return;
         }
 
@@ -215,15 +216,17 @@ public:
 
                 if (product.getCoeff() != 0) {
                     bool found = false;
-                    result.pol.reset();
-                    while (!result.pol.isEnded()) {
-                        Monomial& current = result.pol.current();
-                        if (current.getDegree() == product.getDegree()) {
-                            current = current + product;
-                            found = true;
-                            break;
+                    if (!result.pol.isEmpty()) {
+                        result.pol.reset();
+                        while (!result.pol.isEnded()) {
+                            Monomial& current = result.pol.current();
+                            if (current.getDegree() == product.getDegree()) {
+                                current = current + product;
+                                found = true;
+                                break;
+                            }
+                            result.pol.next();
                         }
-                        result.pol.next();
                     }
                     if (!found) {
                         result.pol.push_back(product);
@@ -287,22 +290,7 @@ public:
     }
 
     bool operator==(const polynomial& p) const {
-        if (pol.isEmpty() || p.pol.isEmpty()) {
-            return false;
-        }
-
-        pol.reset();
-        p.pol.reset();
-
-        while (!pol.isEnded() && !p.pol.isEnded()) {
-            if (pol.current() != p.pol.current()) {
-                return false;
-            }
-            pol.next();
-            p.pol.next();
-        }
-
-        return pol.isEnded() && p.pol.isEnded();
+        return name == p.name;
     }
 
     bool operator!=(const polynomial& p) const {

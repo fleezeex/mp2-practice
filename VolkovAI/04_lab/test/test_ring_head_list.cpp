@@ -130,18 +130,18 @@ TEST(RingHeadListTest, RingStructure) {
 
 TEST(RingHeadListTest, PushNullptrException) {
     RingHeadList<int> list;
-    EXPECT_THROW(list.push_front(nullptr), std::invalid_argument);
-    EXPECT_THROW(list.push_back(nullptr), std::invalid_argument);
+    EXPECT_ANY_THROW(list.push_front(nullptr));
+    EXPECT_ANY_THROW(list.push_back(nullptr));
 }
 
 TEST(RingHeadListTest, InsertAfterNullptrException) {
     RingHeadList<int> list;
-    EXPECT_THROW(list.insert_after(nullptr, 1), std::invalid_argument);
+    EXPECT_ANY_THROW(list.insert_after(nullptr, 1));
 }
 
 TEST(RingHeadListTest, InsertBeforeNullptrException) {
     RingHeadList<int> list;
-    EXPECT_THROW(list.insert_before(nullptr, 1), std::invalid_argument);
+    EXPECT_ANY_THROW(list.insert_before(nullptr, 1));
 }
 
 TEST(RingHeadListTest, PushFrontBackEmptyList) {

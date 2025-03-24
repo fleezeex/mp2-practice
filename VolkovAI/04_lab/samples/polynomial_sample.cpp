@@ -8,8 +8,7 @@ void printMenu() {
     std::cout << "2 - Вычитание полиномов\n";
     std::cout << "3 - Умножение полиномов\n";
     std::cout << "4 - Подставить значения в полином\n";
-    std::cout << "5 - Добавить константу к полиному\n";
-    std::cout << "6 - Выход\n";
+    std::cout << "5 - Выход\n";
 }
 
 void handleOperation(polynomial& p1) {
@@ -19,7 +18,7 @@ void handleOperation(polynomial& p1) {
     printMenu();
     std::cin >> operation;
 
-    while (operation != 6) {
+    while (operation != 5) {
         if (operation == 1) {
             std::cout << "Введите второй полином для сложения: ";
             std::cin.ignore(); // чтобы пропустить символ новой строки после ввода числа
@@ -49,13 +48,6 @@ void handleOperation(polynomial& p1) {
             std::cout << "Введите значение для x, y, z: ";
             std::cin >> x >> y >> z;
             double result = p1(x, y, z);
-            std::cout << "Результат: " << result << "\n";
-        }
-        else if (operation == 5) {
-            double constant;
-            std::cout << "Введите константу для добавления: ";
-            std::cin >> constant;
-            polynomial result = p1 + constant;
             std::cout << "Результат: " << result << "\n";
         }
         else {

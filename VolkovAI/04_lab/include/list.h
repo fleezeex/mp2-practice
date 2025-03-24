@@ -240,7 +240,7 @@ public:
     }
     TElem current() const {
         if (pCurr == nullptr) {
-            throw "Current pointer is nullptr.";
+          throw "Current pointer is nullptr.";
         }
         return pCurr->value;
     }
