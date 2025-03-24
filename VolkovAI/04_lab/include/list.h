@@ -121,7 +121,7 @@ public:
         pLast = pLast->pNext;
     }
 
-    TNode<TElem>* search(TElem value) {
+    TNode<TElem>* search(TElem value) { // TODO
         reset();
         while (!isEnded()) {
             if (current() == value) {
