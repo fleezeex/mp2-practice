@@ -10,7 +10,7 @@ public:
     HeadList(const TElem& elem);
     HeadList(const TList<TElem>& list);
     HeadList(const HeadList<TElem>& list);
-    ~HeadList();
+    virtual ~HeadList();
 
     const HeadList<TElem>& operator=(const HeadList<TElem>& list);
 
@@ -70,15 +70,13 @@ const HeadList<TElem>& HeadList<TElem>::operator=(const HeadList<TElem>& list) {
 template <typename TElem>
 void HeadList<TElem>::push_front(TNode<TElem>* Node) {
     TList<TElem>::push_front(Node);
-    pHead->pNext = pFirst;  // новый первый элемент
+    pHead->pNext = pFirst;
 }
 
 template <typename TElem>
 void HeadList<TElem>::push_back(TNode<TElem>* Node) {
     TList<TElem>::push_back(Node);
-    if (isEmpty()) {
-        pHead->pNext = pFirst;
-    }
+    pHead->pNext = pFirst;
 }
 
 template <typename TElem>
@@ -94,23 +92,14 @@ void HeadList<TElem>::insert_before(TNode<TElem>* Node, TElem key) {
     if (Node == nullptr) {
         throw "Node cannot be nullptr";
     }
-    bool wasFirst = (Node == pFirst);  // вставляем перед первым элементовм?
     TList<TElem>::insert_before(Node, key);
-    if (wasFirst) {  // да - pFirst изменился.
-        pHead->pNext = pFirst;
-    }
+    pHead->pNext = pFirst;
 }
 
 template <typename TElem>
 void HeadList<TElem>::remove(TElem key) {
-    if (isEmpty()) {
-        return;
-    }
-    bool wasFirst = (this->pFirst != nullptr && this->pFirst->value == key);
     TList<TElem>::remove(key);
-    if (wasFirst) {
-        pHead->pNext = this->pFirst;
-    }
+    pHead->pNext = this->pFirst;
 }
 
 template <typename TElem>

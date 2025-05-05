@@ -21,13 +21,13 @@ public:
     void push_back(TNode<TElem>* Node) override;
     void insert_after(TNode<TElem>* Node, TElem val);
     void insert_before(TNode<TElem>* Node, TElem val);
-    void remove(TElem val);
+    void remove(TElem val); // разобратсья с методами
 
     bool operator==(const RingHeadList<TElem>& s) const;
     bool operator!=(const RingHeadList<TElem>& rl) const;
 
 private:
-    void do_ringlist(); 
+    void do_ringlist();  // убить он ваще не нужен
 };
 
 template <typename TElem>

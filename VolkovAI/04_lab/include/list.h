@@ -24,7 +24,7 @@ public:
     TList();
     TList(const TElem& elem);
     TList(const TList<TElem>& list);
-    ~TList();
+    virtual ~TList();
 
     void clear();
     bool isEmpty() const;
@@ -121,6 +121,7 @@ void TList<TElem>::push_front(TNode<TElem>* node) {
     }
     if (isEmpty()) {
         pFirst = node;
+        node->pNext = pStop;
         pCurr = pFirst;
         pPrev = nullptr;
         pLast = pFirst;
@@ -143,6 +144,7 @@ void TList<TElem>::push_back(TNode<TElem>* node) {
     }
     pLast->pNext = node;
     pLast = pLast->pNext;
+    pLast->pNext = pStop;
 }
 
 template <typename TElem>
@@ -179,7 +181,7 @@ void TList<TElem>::insert_after(TNode<TElem>* node, TElem val) {
         throw "Element not found";
     }
     node->pNext = pCurr->pNext;
-    if (pCurr->pNext == nullptr) {
+    if (pCurr->pNext == pStop) {
         pLast = node;
     }
     pCurr->pNext = node;
@@ -193,14 +195,10 @@ void TList<TElem>::remove(const TElem& val) {
     }
     if (pCurr == pFirst) {
         pFirst = pFirst->pNext;
-        if (pFirst == nullptr) {
+        if (pFirst == pStop) {
+            pFirst = nullptr;
             pLast = nullptr;
         }
-        delete pCurr;
-    }
-    else if (pCurr->pNext == nullptr) {
-        pLast = pPrev;
-        pPrev->pNext = nullptr;
         delete pCurr;
     }
     else {
@@ -238,12 +236,13 @@ const TList<TElem>& TList<TElem>::operator=(const TList<TElem>& list) noexcept {
     TNode<TElem>* currentThis = pFirst;
     TNode<TElem>* currentList = list.pFirst->pNext;
 
-    while (currentList != nullptr) {
+    while (currentList != list.pStop) {
         currentThis->pNext = new TNode<TElem>(currentList->value);
         currentThis = currentThis->pNext;
         currentList = currentList->pNext;
     }
-    pLast = currentThis; //
+    pLast = currentThis;
+    pLast->pNext = pStop; /// add
     return *this;
 }
 
