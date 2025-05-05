@@ -5,161 +5,125 @@ template <typename TElem> class HeadList : public TList<TElem> {
 protected:
     TNode<TElem>* pHead;
 public:
-    HeadList() : TList<TElem>() {
-        pHead = new TNode<TElem>(TElem());
-        this->pPrev = pHead;
-    }
-    HeadList(const TNode<TElem>& Node) : TList<TElem>(Node) {
-        pHead = new TNode<TElem>(TElem(), this->pFirst);
-        this->pPrev = pHead;
-    }
-    HeadList(const TElem& elem) : TList<TElem>(elem) {
-        pHead = new TNode<TElem>(TElem(), this->pFirst);
-        this->pPrev = pHead;
-    }
-    HeadList(const TList<TElem>& list) : TList<TElem>(list) {
-        pHead = new TNode<TElem>(TElem(), this->pFirst);
-        this->pPrev = pHead;
-    }
-    HeadList(const HeadList<TElem>& list) : TList<TElem>(list) {
-        pHead = new TNode<TElem>(TElem(), this->pFirst);
-        this->pPrev = pHead;
-    }
-    ~HeadList() {
-        clear();
-        delete pHead;
-    }
+    HeadList();
+    HeadList(const TNode<TElem>& Node);
+    HeadList(const TElem& elem);
+    HeadList(const TList<TElem>& list);
+    HeadList(const HeadList<TElem>& list);
+    ~HeadList();
 
-    void clear() {
-        while (!this->isEmpty()) {
-            TNode<TElem>* node = this->pFirst;
-            this->pFirst = this->pFirst->pNext;
-            delete node;
-        }
-        this->pLast = nullptr;
-        this->pCurr = nullptr;
-        this->pPrev = pHead;
-        if (pHead) {
-            pHead->pNext = nullptr;
-        }
-    }
+    const HeadList<TElem>& operator=(const HeadList<TElem>& list);
 
-    TNode<TElem>* get_pHead() const { return pHead; }
+    virtual void push_front(TNode<TElem>* Node);
+    virtual void push_back(TNode<TElem>* Node);
+    virtual void insert_after(TNode<TElem>* Node, TElem key);
+    virtual void insert_before(TNode<TElem>* Node, TElem key);
+    void remove(TElem key);
+    size_t size() const;
 
-    HeadList<TElem>& operator=(const HeadList<TElem>& list) {
-        if (this == &list) {
-            return *this;
-        }
-        clear();
-        delete pHead;
-        TList<TElem>::operator=(list);
-        pHead = new TNode<TElem>(TElem(), this->pFirst);
-        this->pPrev = pHead;
+
+    bool operator==(const HeadList<TElem>& s) const;
+    bool operator!=(const HeadList<TElem>& list) const;
+
+};
+
+template <typename TElem>
+HeadList<TElem>::HeadList() : TList<TElem>() {
+    pHead = new TNode<TElem>(TElem());
+}
+
+template <typename TElem>
+HeadList<TElem>::HeadList(const TNode<TElem>& Node) : TList<TElem>(Node) {
+    pHead = new TNode<TElem>(TElem(), this->pFirst);
+}
+
+template <typename TElem>
+HeadList<TElem>::HeadList(const TElem& elem) : TList<TElem>(elem) {
+    pHead = new TNode<TElem>(TElem(), this->pFirst);
+}
+
+template <typename TElem>
+HeadList<TElem>::HeadList(const TList<TElem>& list) : TList<TElem>(list) {
+    pHead = new TNode<TElem>(TElem(), this->pFirst);
+}
+
+template <typename TElem>
+HeadList<TElem>::HeadList(const HeadList<TElem>& list) : TList<TElem>(list) {
+    pHead = new TNode<TElem>(TElem(), this->pFirst);
+}
+
+template <typename TElem>
+HeadList<TElem>::~HeadList() {
+    delete pHead;
+}
+
+template <typename TElem>
+const HeadList<TElem>& HeadList<TElem>::operator=(const HeadList<TElem>& list) {
+    if (this == &list) {
         return *this;
     }
+    TList<TElem>::operator=(list);
+    pHead->pNext = this->pFirst;
+    return *this;
+}
 
-    void push_front(TNode<TElem>* Node) {
-        if (Node == nullptr) {
-            throw "Node cannot be nullptr.";
-        }
-        TList<TElem>::push_front(Node);
-        this->pPrev = pHead;
-        if (pHead) {
-            pHead->pNext = Node;
-        }
-    }
+template <typename TElem>
+void HeadList<TElem>::push_front(TNode<TElem>* Node) {
+    TList<TElem>::push_front(Node);
+    pHead->pNext = pFirst;  // новый первый элемент
+}
 
-    void push_back(TNode<TElem>* Node) {
-        if (Node == nullptr) {
-            throw "Trying to insert Node, that is nullptr.";
-        }
-        if (this->isEmpty()) {
-            this->pFirst = Node;
-            this->pLast = Node;
-            this->pCurr = Node;
-            this->pPrev = pHead;
-            pHead->pNext = Node;
-        }
-        else {
-            this->pLast->pNext = Node;
-            this->pLast = Node;
-        }
+template <typename TElem>
+void HeadList<TElem>::push_back(TNode<TElem>* Node) {
+    TList<TElem>::push_back(Node);
+    if (isEmpty()) {
+        pHead->pNext = pFirst;
     }
+}
 
-    void insert_after(TNode<TElem>* Node, TElem key) {
-        if (Node == nullptr) {
-            throw "Node cannot be nullptr.";
-        }
-        this->reset();
-        while (!this->isEnded()) {
-            if (this->current() == key) {
-                Node->pNext = this->pCurr->pNext;
-                if (this->pCurr->pNext == nullptr) {
-                    this->pLast = Node;
-                }
-                this->pCurr->pNext = Node;
-                return;
-            }
-            this->next();
-        }
-        throw "There's no node with entered value.";
+template <typename TElem>
+void HeadList<TElem>::insert_after(TNode<TElem>* Node, TElem key) {
+    if (Node == nullptr) {
+        throw "Node cannot be nullptr";
     }
+    TList<TElem>::insert_after(Node, key);
+}
 
-    void insert_before(TNode<TElem>* Node, TElem key) {
-        if (Node == nullptr) {
-            throw "Node cannot be nullptr.";
-        }
-        this->reset();
-        while (!this->isEnded()) {
-            if (this->current() == key) {
-                if (this->pCurr == this->pFirst) {
-                    this->push_front(Node);
-                }
-                else {
-                    Node->pNext = this->pCurr;
-                    this->pPrev->pNext = Node;
-                }
-                return;
-            }
-            this->next();
-        }
-        throw "There's no node with entered value.";
+template <typename TElem>
+void HeadList<TElem>::insert_before(TNode<TElem>* Node, TElem key) {
+    if (Node == nullptr) {
+        throw "Node cannot be nullptr";
     }
+    bool wasFirst = (Node == pFirst);  // вставляем перед первым элементовм?
+    TList<TElem>::insert_before(Node, key);
+    if (wasFirst) {  // да - pFirst изменился.
+        pHead->pNext = pFirst;
+    }
+}
 
-    void remove(TElem key) {
-        if (this->isEmpty()) {
-            return;
-        }
-        this->reset();
-        while (!this->isEnded()) {
-            if (this->current() == key) {
-                if (this->pCurr == this->pFirst) {
-                    this->pFirst = this->pFirst->pNext;
-                    delete this->pCurr;
-                    pHead->pNext = this->pFirst;
-                    if (this->pFirst == nullptr) {
-                        this->pLast = nullptr;
-                    }
-                }
-                else {
-                    this->pPrev->pNext = this->pCurr->pNext;
-                    delete this->pCurr;
-                }
-                return;
-            }
-            this->next();
-        }
+template <typename TElem>
+void HeadList<TElem>::remove(TElem key) {
+    if (isEmpty()) {
+        return;
     }
+    bool wasFirst = (this->pFirst != nullptr && this->pFirst->value == key);
+    TList<TElem>::remove(key);
+    if (wasFirst) {
+        pHead->pNext = this->pFirst;
+    }
+}
 
-    size_t size() const {
-        return TList<TElem>::size();
-    }
+template <typename TElem>
+size_t HeadList<TElem>::size() const {
+    return TList<TElem>::size();
+}
 
-    bool operator==(const HeadList<TElem>& s) const {
-        return TList<TElem>::operator==(s);
-    }
+template <typename TElem>
+bool HeadList<TElem>::operator==(const HeadList<TElem>& s) const {
+    return TList<TElem>::operator==(s);
+}
 
-    bool operator!=(const HeadList<TElem>& list) const {
-        return !(*this == list);
-    }
-};
+template <typename TElem>
+bool HeadList<TElem>::operator!=(const HeadList<TElem>& list) const {
+    return !(*this == list);
+}
