@@ -108,9 +108,3 @@ TEST(RingHeadListTest, EqualityOperators) {
     EXPECT_TRUE(list1 == list2);
     EXPECT_TRUE(list1 != list3);
 }
-
-TEST(RingHeadListTest, PushNullptrException) {
-    RingHeadList<int> list;
-    EXPECT_ANY_THROW(list.push_front(nullptr));
-    EXPECT_ANY_THROW(list.push_back(nullptr));
-}

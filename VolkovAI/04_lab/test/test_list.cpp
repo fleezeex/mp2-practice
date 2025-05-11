@@ -1,134 +1,141 @@
-#include <gtest.h>
 #include "list.h"
+#include <gtest.h>
 
-TEST(TListTest, TestIsEmpty) {
-    TList<int> list;
-    EXPECT_TRUE(list.isEmpty());
-
-    list.push_front(new TNode<int>(10));
-    EXPECT_FALSE(list.isEmpty());
+TEST(TNodeTest, DefaultConstructorCreatesValidNode) {
+    ASSERT_NO_THROW(TNode<int> node);
 }
 
-TEST(TListTest, TestPushFront) {
-    TList<int> list;
-
-    list.push_front(new TNode<int>(10));
-    list.reset();
-    EXPECT_EQ(list.current(), 10);
-
-    list.push_front(new TNode<int>(20));
-    list.reset();
-    EXPECT_EQ(list.current(), 20);
+TEST(TNodeTest, ConstructorWithValueInitializesCorrectly) {
+    TNode<int> node(5);
+    EXPECT_EQ(node.value, 5);
+    EXPECT_EQ(node.pNext, nullptr);
 }
 
-TEST(TListTest, TestPushBack) {
-    TList<int> list;
-
-    list.push_back(new TNode<int>(10));
-    list.reset();
-    EXPECT_EQ(list.current(), 10);
-
-    list.push_back(new TNode<int>(20));
-    EXPECT_EQ(list.size(), 2);
+TEST(TNodeTest, NodeAssignmentWorksCorrectly) {
+    TNode<int> node1(3);
+    TNode<int> node2(8);
+    node1 = node2;
+    EXPECT_EQ(node1.value, 8);
 }
 
-TEST(TListTest, TestSearch) {
-    TList<int> list;
-
-    list.push_back(new TNode<int>(10));
-    list.push_back(new TNode<int>(20));
-
-    TNode<int>* foundNode = list.search(20);
-    EXPECT_NE(foundNode, nullptr);
-    if (foundNode) {
-        EXPECT_EQ(foundNode->value, 20);
-    }
-
-    EXPECT_EQ(list.search(30), nullptr);
+TEST(TListTest, EmptyListCreation) {
+    ASSERT_NO_THROW(TList<int> lst);
 }
 
-TEST(TListTest, TestInsertBefore) {
-    TList<int> list;
+TEST(TListTest, ListCopyConstructor) {
+    TList<int> original;
+    TNode<int>* node = new TNode<int>(2);
+    original.push_front(node);
 
-    list.push_back(new TNode<int>(10));
-    list.push_back(new TNode<int>(20));
-
-    list.insert_before(new TNode<int>(15), 20);
-    EXPECT_EQ(list.size(), 3);
-    list.reset();
-    EXPECT_EQ(list.current(), 10);
-    list.next();
-    EXPECT_EQ(list.current(), 15);
+    TList<int> copy(original);
+    EXPECT_TRUE(original == copy);
 }
 
-TEST(TListTest, TestInsertAfter) {
-    TList<int> list;
+TEST(TListTest, CopiedListsIndependent) {
+    TList<int> first;
+    first.push_front(new TNode<int>(3));
 
-    list.push_back(new TNode<int>(10));
-    list.push_back(new TNode<int>(20));
+    TList<int> second(first);
+    second.push_front(new TNode<int>(7));
 
-    list.insert_after(new TNode<int>(25), 20);
-    EXPECT_EQ(list.size(), 3);
+    EXPECT_FALSE(first == second);
 }
 
-TEST(TListTest, TestRemove) {
-    TList<int> list;
-
-    list.push_back(new TNode<int>(10));
-    list.push_back(new TNode<int>(20));
-
-    list.remove(10);
-    EXPECT_EQ(list.size(), 1);
-    list.reset();
-    EXPECT_EQ(list.current(), 20);
+TEST(TListTest, FindExistingElement) {
+    TList<int> lst;
+    lst.push_front(new TNode<int>(4));
+    EXPECT_NE(lst.search(4), nullptr);
 }
 
-TEST(TListTest, TestSize) {
-    TList<int> list;
-
-    list.push_back(new TNode<int>(10));
-    EXPECT_EQ(list.size(), 1);
-
-    list.push_back(new TNode<int>(20));
-    EXPECT_EQ(list.size(), 2);
+TEST(TListTest, NonExistingElementSearch) {
+    TList<int> lst;
+    lst.push_front(new TNode<int>(4));
+    EXPECT_EQ(lst.search(8), nullptr);
 }
 
-TEST(TListTest, TestCopyConstructor) {
-    TList<int> list1;
-    list1.push_back(new TNode<int>(10));
-    list1.push_back(new TNode<int>(20));
-
-    TList<int> list2 = list1;
-    EXPECT_EQ(list1.size(), list2.size());
-    list2.reset();
-    EXPECT_EQ(list2.current(), 10);
+TEST(TListTest, FrontInsertion) {
+    TList<int> lst;
+    ASSERT_NO_THROW(lst.push_front(new TNode<int>(6)));
 }
 
-TEST(TListTest, TestAssignmentOperator) {
-    TList<int> list1;
-    list1.push_back(new TNode<int>(10));
-    list1.push_back(new TNode<int>(20));
-
-    TList<int> list2;
-    list2 = list1;
-    EXPECT_EQ(list1.size(), list2.size());
-    list2.reset();
-    EXPECT_EQ(list2.current(), 10);
+TEST(TListTest, FrontInsertedElementFound) {
+    TList<int> lst;
+    lst.push_front(new TNode<int>(9));
+    EXPECT_EQ(lst.search(9)->value, 9);
 }
 
-TEST(TListTest, TestEqualityOperator) {
-    TList<int> list1;
-    list1.push_back(new TNode<int>(10));
-    list1.push_back(new TNode<int>(20));
+TEST(TListTest, BackInsertion) {
+    TList<int> lst;
+    ASSERT_NO_THROW(lst.push_back(new TNode<int>(11)));
+}
 
-    TList<int> list2;
-    list2.push_back(new TNode<int>(10));
-    list2.push_back(new TNode<int>(20));
+TEST(TListTest, BackInsertedElementFound) {
+    TList<int> lst;
+    lst.push_back(new TNode<int>(13));
+    EXPECT_EQ(lst.search(13)->value, 13);
+}
 
-    EXPECT_TRUE(list1 == list2);
+TEST(TListTest, InsertBeforeExisting) {
+    TList<int> lst;
+    lst.push_back(new TNode<int>(15));
+    ASSERT_NO_THROW(lst.insert_before(new TNode<int>(14), 15));
+}
 
-    TList<int> list3;
-    list3.push_back(new TNode<int>(30));
+TEST(TListTest, InsertBeforeNonExisting) {
+    TList<int> lst;
+    lst.push_back(new TNode<int>(16));
+    ASSERT_ANY_THROW(lst.insert_before(new TNode<int>(17), 99));
+}
 
-    EXPECT_FALSE(list1 == list3);
+TEST(TListTest, InsertAfterExisting) {
+    TList<int> lst;
+    lst.push_back(new TNode<int>(18));
+    ASSERT_NO_THROW(lst.insert_after(new TNode<int>(19), 18));
+}
+
+TEST(TListTest, ElementRemoval) {
+    TList<int> lst;
+    lst.push_back(new TNode<int>(20));
+    ASSERT_NO_THROW(lst.remove(20));
+}
+
+TEST(TListTest, RemoveNonExisting) {
+    TList<int> lst;
+    lst.push_back(new TNode<int>(21));
+    ASSERT_ANY_THROW(lst.remove(99));
+}
+
+TEST(TListTest, ListAssignment) {
+    TList<int> first;
+    first.push_back(new TNode<int>(22));
+
+    TList<int> second;
+    second = first;
+
+    EXPECT_TRUE(first == second);
+}
+
+TEST(TListTest, EmptyListSize) {
+    TList<int> lst;
+    EXPECT_EQ(lst.size(), 0);
+}
+
+TEST(TListTest, NonEmptyListSize) {
+    TList<int> lst;
+    lst.push_back(new TNode<int>(23));
+    lst.push_back(new TNode<int>(24));
+    EXPECT_EQ(lst.size(), 2);
+}
+
+TEST(TListTest, ListIteration) {
+    TList<int> lst;
+    lst.push_back(new TNode<int>(25));
+    lst.push_back(new TNode<int>(26));
+
+    lst.reset();
+    EXPECT_EQ(lst.current(), 25);
+    lst.next();
+    EXPECT_EQ(lst.current(), 26);
+    lst.next();
+    EXPECT_TRUE(lst.isEnded());
 }
